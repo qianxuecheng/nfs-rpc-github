@@ -15,9 +15,11 @@ import code.google.nfs.rpc.protocol.RPCProtocol;
  * Integer protocolType* *
  */
 public class ReferenceConfig {
+    
     public static final int DEFAULT_METHOD_TIMEOUT = 200;
     public static final int DEFAULT_CLIENT_NUMS = 1;
     public static final int DEFAULT_CONNECTION_TIMEOUT = 200;
+    
     private String interfaceName;
     private List<InetSocketAddress> servers;
 

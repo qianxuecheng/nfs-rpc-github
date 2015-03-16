@@ -9,5 +9,7 @@ public class NfsNamespaceHandler extends NamespaceHandlerSupport{
     @Override
     public void init() {
         registerBeanDefinitionParser("reference",new NfsReferenceBeanDefinitionParser());
+        registerBeanDefinitionParser("service",new NfsServiceBeanDefinitionParser());
+        registerBeanDefinitionParser("registry",new NfsRegistryBeanDefinitionParser());
     }
 }

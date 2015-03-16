@@ -43,7 +43,16 @@ public class NettyServer implements Server {
 	private AtomicBoolean startFlag = new AtomicBoolean(false);
 	
 	private static final int PROCESSORS = Runtime.getRuntime().availableProcessors();
-	
+	private static class SingletonHolder{
+		static final NettyServer server=new NettyServer();
+
+	}
+	public  static NettyServer getInstance(){
+		return  SingletonHolder.server;
+
+	}
+
+
 	public NettyServer() {
 		ThreadFactory serverBossTF = new NamedThreadFactory("NETTYSERVER-BOSS-");
 		ThreadFactory serverWorkerTF = new NamedThreadFactory("NETTYSERVER-WORKER-");

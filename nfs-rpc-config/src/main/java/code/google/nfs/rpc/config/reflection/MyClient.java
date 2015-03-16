@@ -29,7 +29,7 @@ public class MyClient {
                 new Class<?>[]{HelloWorldService.class},
                 new NettyClientInvocationHandler(servers,1,300,"helloServiceImpl1",methodTimeouts,codectype, RPCProtocol.TYPE)
         );*/
-        HelloWorldService h1= (HelloWorldService) context.getBean("helloService");
+        HelloWorldService h1= (HelloWorldService) context.getBean("helloWorld");
         
         System.out.println(h1.sayHello("qian"));
 

@@ -38,6 +38,7 @@ public class NettyServer implements Server {
 
 	private AtomicBoolean startFlag = new AtomicBoolean(false);
 	
+
 	public NettyServer() {
 		ThreadFactory serverBossTF = new NamedThreadFactory("NETTYSERVER-BOSS-");
 		ThreadFactory serverWorkerTF = new NamedThreadFactory("NETTYSERVER-WORKER-");
