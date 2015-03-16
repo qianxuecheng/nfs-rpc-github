@@ -38,6 +38,7 @@ public class NettyClientFactory extends AbstractClientFactory {
 	
 	private static final int PROCESSORS = Runtime.getRuntime().availableProcessors();
 	
+	
 	private static AbstractClientFactory _self = new NettyClientFactory();
 	
 	private static final ThreadFactory workerThreadFactory = new NamedThreadFactory("NETTYCLIENT-WORKER-");

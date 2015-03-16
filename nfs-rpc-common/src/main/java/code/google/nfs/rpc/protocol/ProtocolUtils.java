@@ -36,6 +36,7 @@ public class ProtocolUtils {
 	}
 
 	public static Object decode(ByteBufferWrapper wrapper, Object errorObject) throws Exception {
+		//readerIndex
 		final int originPos = wrapper.readerIndex();
 		if(wrapper.readableBytes() < 2){
 			wrapper.setReaderIndex(originPos);

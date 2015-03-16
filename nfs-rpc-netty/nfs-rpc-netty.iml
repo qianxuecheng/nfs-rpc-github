@@ -23,7 +23,7 @@
     <orderEntry type="library" name="Maven: log4j:log4j:1.2.12" level="project" />
     <orderEntry type="library" name="Maven: logkit:logkit:1.0.1" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty:3.5.8.Final" level="project" />
-    <orderEntry type="module" module-name="nfs-rpc-common" />
+    <orderEntry type="module" module-name="nfs-rpc-config" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">

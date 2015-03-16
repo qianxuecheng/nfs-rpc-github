@@ -47,7 +47,7 @@ public class NettyServer implements Server {
 	public NettyServer() {
 		ThreadFactory serverBossTF = new NamedThreadFactory("NETTYSERVER-BOSS-");
 		ThreadFactory serverWorkerTF = new NamedThreadFactory("NETTYSERVER-WORKER-");
-		EventLoopGroup bossGroup = new NioEventLoopGroup(PROCESSORS, serverBossTF);
+		EventLoopGroup bossGroup = new NioEventLoopGroup(PROCESSORS, serverBossTF);//mianReactor subReactor
 		NioEventLoopGroup workerGroup = new NioEventLoopGroup(PROCESSORS * 2,serverWorkerTF);
 		workerGroup.setIoRatio(Integer.parseInt(System.getProperty("nfs.rpc.io.ratio", "50")));
 		bootstrap = new ServerBootstrap();

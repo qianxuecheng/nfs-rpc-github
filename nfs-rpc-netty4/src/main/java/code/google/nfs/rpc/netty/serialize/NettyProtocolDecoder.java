@@ -203,6 +203,7 @@ public class NettyProtocolDecoder extends ChannelInboundHandlerAdapter {
             while (in.isReadable()) {
                 int outSize = out.size();
                 int oldInputLength = in.readableBytes();
+
                 decode(ctx, in, out);
 
                 // Check if this handler was removed before try to continue the loop.
@@ -213,7 +214,7 @@ public class NettyProtocolDecoder extends ChannelInboundHandlerAdapter {
                     break;
                 }
 
-                if (outSize == out.size()) {
+                if (outSize == out.size()) {//没有增加一个对象
                     if (oldInputLength == in.readableBytes()) {
                         break;
                     } else {
