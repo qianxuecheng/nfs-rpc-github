@@ -5,11 +5,10 @@ import java.util.*;
 
 import code.google.nfs.rpc.Codecs;
 import code.google.nfs.rpc.protocol.RPCProtocol;
+
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
-import org.springframework.util.CollectionUtils;
 
 
 /**
@@ -18,17 +17,17 @@ import org.springframework.util.CollectionUtils;
  *
  */
 public class ReferenceConfig {
-    
+
     public static final int DEFAULT_METHOD_TIMEOUT = 200;
     public static final int DEFAULT_CLIENT_NUMS = 1;
     public static final int DEFAULT_CONNECTION_TIMEOUT = 200;
-    
+
     private String interfaceName;
-    private volatile  List<InetSocketAddress> servers;
+    private volatile List<InetSocketAddress> servers;
 
     private String address;
-    
-    private Object serversMonitor=new Object();
+
+    private Object serversMonitor = new Object();
     // per [ip:port]
     int clientNums = DEFAULT_CLIENT_NUMS;
     int connectTimeout = DEFAULT_CONNECTION_TIMEOUT;
@@ -62,33 +61,39 @@ public class ReferenceConfig {
         this.methodTimeouts = methodTimeouts;
     }
 
+
     public int getCodecType() {
         return codecType;
     }
+
 
     public void setCodecType(int codecType) {
         this.codecType = codecType;
     }
 
+
     public String getAddress() {
         return address;
     }
+
 
     public void setAddress(String address) {
         this.address = address;
     }
 
+
     public void setInterfaceName(String interfaceName) {
         this.interfaceName = interfaceName;
     }
 
-    //concurrency problem
-    //in which thread
+
+    // concurrency problem
+    // in which thread
     public List<InetSocketAddress> getServers() {
-        if(Strings.isNullOrEmpty(address)){
-            return  Collections.EMPTY_LIST;
+        if (Strings.isNullOrEmpty(address)) {
+            return Collections.EMPTY_LIST;
         }
-        if(servers==null||servers.size()==0){
+        if (servers == null || servers.size() == 0) {
             synchronized (serversMonitor) {
                 Iterable<String> split = Splitter.on(",").omitEmptyStrings().split(address);
                 Iterator<String> it = split.iterator();
@@ -103,8 +108,8 @@ public class ReferenceConfig {
                 this.servers = servers;
             }
         }
-        return  servers;
-        
+        return servers;
+
     }
 
 
