@@ -16,6 +16,7 @@ public class ServiceConfig implements ApplicationContextAware,ApplicationListene
     private String interfaceName;
     
     private String targetInstanceName;
+    private String ref;
 
     public String getInterfaceName() {
         return interfaceName;
@@ -41,7 +42,7 @@ public class ServiceConfig implements ApplicationContextAware,ApplicationListene
         this.ref = ref;
     }
 
-    private String ref;
+   
     
 
 
