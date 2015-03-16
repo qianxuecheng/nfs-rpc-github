@@ -10,9 +10,7 @@ import code.google.nfs.rpc.protocol.RPCProtocol;
 /**
  * Created by qianxuecheng on 15/3/16.
  * 
- * ist<InetSocketAddress> servers, int clientNums, int connectTimeout, String
- * targetInstanceName, Map<String, Integer> methodTimeouts,int codectype,
- * Integer protocolType* *
+ *
  */
 public class ReferenceConfig {
     
