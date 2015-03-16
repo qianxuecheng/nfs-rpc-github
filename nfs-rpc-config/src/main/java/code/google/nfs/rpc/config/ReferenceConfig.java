@@ -5,6 +5,11 @@ import java.util.*;
 
 import code.google.nfs.rpc.Codecs;
 import code.google.nfs.rpc.protocol.RPCProtocol;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+import org.springframework.util.CollectionUtils;
 
 
 /**
@@ -19,9 +24,11 @@ public class ReferenceConfig {
     public static final int DEFAULT_CONNECTION_TIMEOUT = 200;
     
     private String interfaceName;
-    private List<InetSocketAddress> servers;
+    private volatile  List<InetSocketAddress> servers;
 
     private String address;
+    
+    private Object serversMonitor=new Object();
     // per [ip:port]
     int clientNums = DEFAULT_CLIENT_NUMS;
     int connectTimeout = DEFAULT_CONNECTION_TIMEOUT;
@@ -75,9 +82,29 @@ public class ReferenceConfig {
         this.interfaceName = interfaceName;
     }
 
-
+    //concurrency problem
+    //in which thread
     public List<InetSocketAddress> getServers() {
-        return new ArrayList<InetSocketAddress>(Arrays.asList(new InetSocketAddress[]{new InetSocketAddress(18888)}));
+        if(Strings.isNullOrEmpty(address)){
+            return  Collections.EMPTY_LIST;
+        }
+        if(servers==null||servers.size()==0){
+            synchronized (serversMonitor) {
+                Iterable<String> split = Splitter.on(",").omitEmptyStrings().split(address);
+                Iterator<String> it = split.iterator();
+                List<InetSocketAddress> servers = Lists.newArrayList();
+                while (it.hasNext()) {
+                    String[] ipAndPort = it.next().split(":");
+                    String ip = ipAndPort[0];
+                    String port = ipAndPort[1];
+                    InetSocketAddress socketAddress = new InetSocketAddress(ip, Integer.parseInt(port));
+                    servers.add(socketAddress);
+                }
+                this.servers = servers;
+            }
+        }
+        return  servers;
+        
     }
 
 

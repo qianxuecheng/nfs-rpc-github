@@ -5,6 +5,6 @@
 
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.nfs.com/schema/nfs http://www.nfs.com/schema/nfs/nfs.xsd">
     
-    <nfs:reference id="helloWorld"  interfaceName="code.google.nfs.rpc.config.reflection.HelloWorldService"  protocolType="1" codecType="4"  address="127.0.0.1:10009"  targetInstanceName="helloServiceImpl1"/>
+    <nfs:reference id="helloWorld"  interfaceName="code.google.nfs.rpc.config.reflection.HelloWorldService"  protocolType="1" codecType="4"  address="127.0.0.1:18888"  targetInstanceName="helloServiceImpl1"/>
     
 </beans>
