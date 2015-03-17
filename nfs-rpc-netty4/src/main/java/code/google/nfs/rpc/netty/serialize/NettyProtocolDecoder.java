@@ -90,7 +90,7 @@ public class NettyProtocolDecoder extends ChannelInboundHandlerAdapter {
                     }
                 } else {
                     try {
-                        if (cumulation.writerIndex() > cumulation.maxCapacity() - data.readableBytes()) {
+                        if (cumulation.writerIndex() > cumulation.maxCapacity() - data.readableBytes()) {//如果cumulation容量不足
                             ByteBuf oldCumulation = cumulation;
                             cumulation = ctx.alloc().buffer(oldCumulation.readableBytes() + data.readableBytes());
                             cumulation.writeBytes(oldCumulation);
@@ -203,7 +203,7 @@ public class NettyProtocolDecoder extends ChannelInboundHandlerAdapter {
             while (in.isReadable()) {
                 int outSize = out.size();
                 int oldInputLength = in.readableBytes();
-
+                //only one
                 decode(ctx, in, out);
 
                 // Check if this handler was removed before try to continue the loop.

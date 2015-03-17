@@ -22,13 +22,12 @@ public class ReferenceConfig {
     public static final int DEFAULT_CLIENT_NUMS = 1;
     public static final int DEFAULT_CONNECTION_TIMEOUT = 200;
 
+    private Object serversMonitor = new Object();
     private String interfaceName;
-    private volatile List<InetSocketAddress> servers;
-
     private String address;
 
-    private Object serversMonitor = new Object();
-    // per [ip:port]
+    private volatile List<InetSocketAddress> servers;
+
     int clientNums = DEFAULT_CLIENT_NUMS;
     int connectTimeout = DEFAULT_CONNECTION_TIMEOUT;
     // targetInstanceName

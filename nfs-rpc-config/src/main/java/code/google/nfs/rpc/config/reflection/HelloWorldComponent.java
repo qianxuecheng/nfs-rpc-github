@@ -6,6 +6,6 @@ package code.google.nfs.rpc.config.reflection;
 public class HelloWorldComponent implements HelloWorldService {
     @Override
     public String sayHello(String world) {
-        return world+" return  by server";
+        return world + " return  by server";
     }
 }
