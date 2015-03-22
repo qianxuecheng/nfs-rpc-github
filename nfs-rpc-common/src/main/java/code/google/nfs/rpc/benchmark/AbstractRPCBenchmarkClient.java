@@ -30,7 +30,7 @@ public abstract class AbstractRPCBenchmarkClient extends AbstractBenchmarkClient
 		methodTimeouts.put("*", rpcTimeout);
 		List<InetSocketAddress> servers = new ArrayList<InetSocketAddress>();
 		servers.add(new InetSocketAddress(targetIP, targetPort));
-		String serviceName = "testservice";
+		String serviceName = "testservice";//targetInstanceName
 		if(codecType == Codecs.PB_CODEC){
 			serviceName = "testservicepb";
 		}

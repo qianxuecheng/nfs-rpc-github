@@ -22,7 +22,7 @@ public abstract class AbstractClientFactory implements ClientFactory {
 	// Cache client
 	private static ConcurrentHashMap<String, FutureTask<List<Client>>> clients = 
 		new ConcurrentHashMap<String, FutureTask<List<Client>>>();
-	
+	//XXXEnabled
 	private static boolean isSendLimitEnabled = false;
 
 	public Client get(final String targetIP, final int targetPort,
@@ -37,7 +37,7 @@ public abstract class AbstractClientFactory implements ClientFactory {
 		if (customKey != null && customKey.length == 1) {
 			key = customKey[0];
 		}
-		if (clients.containsKey(key)) {
+		if (clients.containsKey(key)) {//Random
 			if (clientNums == 1) {
 				return clients.get(key).get().get(0);
 			} else {

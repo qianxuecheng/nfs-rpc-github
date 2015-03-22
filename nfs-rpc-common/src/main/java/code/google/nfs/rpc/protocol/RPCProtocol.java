@@ -16,6 +16,7 @@ import code.google.nfs.rpc.RequestWrapper;
 import code.google.nfs.rpc.ResponseWrapper;
 
 /**
+ * HTTP Protocol
  * Common RPC Protocol
  * 
  * Protocol Header
@@ -126,7 +127,7 @@ public class RPCProtocol implements Protocol {
 				byteBuffer.writeInt(id);
 				byteBuffer.writeInt(timeout);
 				byteBuffer.writeInt(targetInstanceNameByte.length);
-				byteBuffer.writeInt(methodNameByte.length);
+				byteBuffer.writeInt(methodNameByte.length);//方法名
 				byteBuffer.writeInt(requestArgs.size());
 				for (byte[] requestArgType : requestArgTypes) {
 					byteBuffer.writeInt(requestArgType.length);
@@ -175,7 +176,7 @@ public class RPCProtocol implements Protocol {
 			type = RESPONSE;
 			int capacity = ProtocolUtils.HEADER_LEN + RESPONSE_HEADER_LEN + body.length;
 			if(wrapper.getCodecType() == Codecs.PB_CODEC){
-				capacity += className.length;
+				capacity += className.length;//PB需要类名
 			}
 			ByteBufferWrapper byteBuffer = bytebufferWrapper.get(capacity);
 			byteBuffer.writeByte(ProtocolUtils.CURRENT_VERSION);
@@ -188,7 +189,7 @@ public class RPCProtocol implements Protocol {
 			byteBuffer.writeByte((byte)0);
 			byteBuffer.writeInt(id);
 			if(wrapper.getCodecType() == Codecs.PB_CODEC){
-				byteBuffer.writeInt(className.length);
+				byteBuffer.writeInt(className.length);//类名长度
 			}
 			else{
 				byteBuffer.writeInt(0);

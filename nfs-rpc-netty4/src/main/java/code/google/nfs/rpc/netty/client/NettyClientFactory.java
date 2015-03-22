@@ -65,7 +65,7 @@ public class NettyClientFactory extends AbstractClientFactory {
 			bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000);
 		}
 		else{
-			bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout);
+			bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout);//connect().await()
 		}
 		final NettyClientHandler handler = new NettyClientHandler(this, key);
 		bootstrap.handler(new ChannelInitializer<SocketChannel>() {

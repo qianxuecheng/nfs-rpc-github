@@ -23,7 +23,7 @@ public interface ClientFactory {
 	 * 	ClientFactory.sendLimitPercent = 50 -Xmx1g
 	 *   if sending bytes size reaches 500m,when u call client.invokeSync then it'll throw NFSRPCRejectException
 	 */
-	public static int sendLimitPercent = 50;
+	public static int sendLimitPercent = 50;//
 	
 	public static SendLimitPolicy sendLimitPolicy = SendLimitPolicy.REJECT;
 	
@@ -48,6 +48,7 @@ public interface ClientFactory {
 	
 	/**
 	 * check if exceed the send limit,if exceed then do sth based on SendLimitPolicy
+	 * qmq use RateLimiter
 	 */
 	public void checkSendLimit() throws Exception;
 	

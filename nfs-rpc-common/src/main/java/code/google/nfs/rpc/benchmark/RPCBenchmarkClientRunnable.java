@@ -103,7 +103,7 @@ public class RPCBenchmarkClientRunnable implements ClientRunnable {
 		while (running) {
 			Object requestObject = new RequestObject(requestSize);
 			long beginTime = System.currentTimeMillis();
-			if (beginTime >= endTime) {
+			if (beginTime >= endTime) {//时间到
 				running = false;
 				break;
 			}
@@ -155,14 +155,14 @@ public class RPCBenchmarkClientRunnable implements ClientRunnable {
 			objectBuilder.setBytesObject(ByteString.copyFrom(new byte[requestSize]));
 			PB.RequestObject requestObject = objectBuilder.build();
 			long beginTime = System.currentTimeMillis();
-			if (beginTime >= endTime) {
+			if (beginTime >= endTime) {//time's up
 				running = false;
 				break;
 			}
 			try {
 				Object response = testService.executePB(requestObject);
 				long currentTime = System.currentTimeMillis();
-				if(beginTime <= startTime){
+				if(beginTime <= startTime){//warm up
 					continue;
 				}
 				long consumeTime = currentTime - beginTime;

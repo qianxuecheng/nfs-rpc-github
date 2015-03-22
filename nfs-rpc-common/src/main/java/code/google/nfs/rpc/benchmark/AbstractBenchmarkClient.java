@@ -32,7 +32,7 @@ import code.google.nfs.rpc.protocol.PBDecoder;
  */
 public abstract class AbstractBenchmarkClient {
 
-	private static final SimpleDateFormat dateFormat = new SimpleDateFormat(
+	private static final SimpleDateFormat/* thread-unsafe */ dateFormat = new SimpleDateFormat(//FastDateFormat
 			"yyyy-MM-dd HH:mm:ss");
 
 	private static long maxTPS = 0;
@@ -84,7 +84,7 @@ public abstract class AbstractBenchmarkClient {
 
 		final String serverIP = args[0];
 		final int serverPort = Integer.parseInt(args[1]);
-		final int concurrents = Integer.parseInt(args[2]);
+		final int concurrents = Integer.parseInt(args[2]);//concurrencyLevel
 		final int timeout = Integer.parseInt(args[3]);
 		final int codectype = Integer.parseInt(args[4]);
 		final int requestSize = Integer.parseInt(args[5]);
@@ -135,7 +135,7 @@ public abstract class AbstractBenchmarkClient {
 			runnables.add(runnable);
 		}
 
-                startRunnables(runnables);
+		startRunnables(runnables);
 
 		latch.await();
 

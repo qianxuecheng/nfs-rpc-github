@@ -64,7 +64,10 @@ public class NettyServer implements Server {
 			     .channel(NioServerSocketChannel.class)
 			     .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 			     .option(ChannelOption.SO_REUSEADDR, Boolean.parseBoolean(System.getProperty("nfs.rpc.tcp.reuseaddress", "true")))
-			     .option(ChannelOption.TCP_NODELAY, Boolean.parseBoolean(System.getProperty("nfs.rpc.tcp.nodelay", "true")));
+			     .option(ChannelOption.TCP_NODELAY, Boolean.parseBoolean(System.getProperty("nfs.rpc.tcp.nodelay", "true"))
+
+				 );
+				
 	}
 
 	public void start(int listenPort, final ExecutorService threadPool) throws Exception {
