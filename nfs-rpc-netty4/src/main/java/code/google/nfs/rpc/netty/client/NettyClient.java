@@ -45,11 +45,11 @@ public class NettyClient extends AbstractClient {
 			throws Exception {
 		final long beginTime = System.currentTimeMillis();
 		final Client self = this;
-		ChannelFuture writeFuture = cf.channel().writeAndFlush(wrapper);
+		ChannelFuture writeFuture = cf.channel().writeAndFlush(wrapper);//Non-Blocking
 		// use listener to avoid wait for write & thread context switch
 		writeFuture.addListener(new ChannelFutureListener() {
 			public void operationComplete(ChannelFuture future)
-					throws Exception {
+					throws Exception {//workerGroup
 				if (future.isSuccess()) {
 					return;
 				}

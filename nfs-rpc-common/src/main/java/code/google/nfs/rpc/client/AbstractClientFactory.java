@@ -59,7 +59,7 @@ public abstract class AbstractClientFactory implements ClientFactory {
 							return clients;
 						}
 					});
-			FutureTask<List<Client>> currentTask = clients.putIfAbsent(key,task);
+			FutureTask<List<Client>> currentTask = clients.putIfAbsent(key,task);//previous
 			if (currentTask == null) {
 				task.run();
 			} 

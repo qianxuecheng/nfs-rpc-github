@@ -24,7 +24,7 @@ public class MyClient {
         HelloWorldService service=(HelloWorldService) Proxy.newProxyInstance(
                 Thread.currentThread().getContextClassLoader(),
                 new Class<?>[]{HelloWorldService.class},
-                new NettyClientInvocationHandler(servers,1,300,"helloworld",methodTimeouts,codectype, RPCProtocol.TYPE)
+                new NettyClientInvocationHandler(servers,1,300,"helloServiceImpl1",methodTimeouts,codectype, RPCProtocol.TYPE)
         );
         System.out.println(service.sayHello("qian"));
 

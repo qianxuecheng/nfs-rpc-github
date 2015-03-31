@@ -62,7 +62,7 @@ public abstract class AbstractClientInvocationHandler implements InvocationHandl
 		}
 		Client client = getClientFactory().get(server.getAddress().getHostAddress(), server.getPort(), connectTimeout, clientNums);
 		String methodName = method.getName();
-		String[] argTypes = createParamSignature(method.getParameterTypes());
+		String[] argTypes = createParamSignature(method.getParameterTypes());//why not methodSignature
 		int timeout = 0;
 		if(methodTimeouts.containsKey(methodName.toLowerCase())){
 			timeout = methodTimeouts.get(methodName);
@@ -70,12 +70,13 @@ public abstract class AbstractClientInvocationHandler implements InvocationHandl
 		else{
 			timeout = methodTimeouts.get("*");
 		}
+		//what do you think of 'Async'! aha..
 		return client.invokeSync(targetInstanceName, methodName, argTypes, args, timeout, codecType, protocolType);
 	}
 	
 	private String[] createParamSignature(Class<?>[] argTypes) {
         if (argTypes == null || argTypes.length == 0) {
-            return new String[] {};
+            return new String[]{};
         }
         String[] paramSig = new String[argTypes.length];
         for (int x = 0; x < argTypes.length; x++) {

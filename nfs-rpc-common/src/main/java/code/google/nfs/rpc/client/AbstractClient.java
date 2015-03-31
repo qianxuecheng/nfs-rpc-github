@@ -79,6 +79,8 @@ public abstract class AbstractClient implements Client {
 			throw e;
 		}
 		Object result = null;
+		//客户端异步化
+		
 		try {
 			result = responseQueue.poll(
 					wrapper.getTimeout() - (System.currentTimeMillis() - beginTime),
@@ -109,7 +111,7 @@ public abstract class AbstractClient implements Client {
 		}
 		
 		if(result instanceof ResponseWrapper){
-			responseWrapper = (ResponseWrapper) result;
+			responseWrapper = (ResponseWrapper) result;//
 		}
 		else if(result instanceof List){
 			@SuppressWarnings("unchecked")
@@ -199,9 +201,10 @@ public abstract class AbstractClient implements Client {
 			}
 			try {
 				ArrayBlockingQueue<Object> queue = responses.get(wrapper.getRequestId());
-				if (queue != null) {
-					queue.put(wrappers);
+				if (queue != null) {//
+					queue.put(wrappers);//bug
 					break;
+					
 				} 
 				else {
 					LOGGER.warn("give up the response,request id is:"
