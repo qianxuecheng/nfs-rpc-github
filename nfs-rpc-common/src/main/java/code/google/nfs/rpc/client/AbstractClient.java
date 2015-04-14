@@ -7,9 +7,7 @@ package code.google.nfs.rpc.client;
  *   http://code.google.com/p/nfs-rpc (c) 2011
  */
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,6 +34,7 @@ public abstract class AbstractClient implements Client {
 
 	protected static ConcurrentHashMap<Integer, ArrayBlockingQueue<Object>> responses = 
 			new ConcurrentHashMap<Integer, ArrayBlockingQueue<Object>>();
+	private static ExecutorService executor=Executors.newFixedThreadPool(10);
 	
 	public Object invokeSync(Object message, int timeout, int codecType, int protocolType)
 			throws Exception {
@@ -55,11 +54,11 @@ public abstract class AbstractClient implements Client {
 		return invokeSyncIntern(wrapper);
 	}
 
-	private Object invokeSyncIntern(RequestWrapper wrapper) throws Exception {
-		long beginTime = System.currentTimeMillis();
+	private Object invokeSyncIntern(final RequestWrapper wrapper) throws Exception {
+		final long beginTime = System.currentTimeMillis();
 		ArrayBlockingQueue<Object> responseQueue = new ArrayBlockingQueue<Object>(1);
 		responses.put(wrapper.getId(), responseQueue);
-		ResponseWrapper responseWrapper = null;
+	
 		try {
 			if(isDebugEnabled){
 				// for performance trace
@@ -78,93 +77,111 @@ public abstract class AbstractClient implements Client {
 			LOGGER.error("send request to os sendbuffer error", e);
 			throw e;
 		}
-		Object result = null;
 		//客户端异步化
-		
-		try {
-			result = responseQueue.poll(
-					wrapper.getTimeout() - (System.currentTimeMillis() - beginTime),
-					TimeUnit.MILLISECONDS);
-		}
-		catch(Exception e){
-			responses.remove(wrapper.getId());
-			LOGGER.error("Get response error", e);
-			throw new Exception("Get response error", e);
-		}
-		responses.remove(wrapper.getId());
-		
-		if (PRINT_CONSUME_MINTIME > 0 && isWarnEnabled) {
-			long consumeTime = System.currentTimeMillis() - beginTime;
-			if (consumeTime > PRINT_CONSUME_MINTIME) {
-				LOGGER.warn("client.invokeSync consume time: "
-						+ consumeTime + " ms, server is: " + getServerIP()
-						+ ":" + getServerPort() + " request id is:"
-						+ wrapper.getId());
+
+		final ArrayBlockingQueue<Object> finalResponseQueue = responseQueue;
+		//now turn ["sync"] into ["async"]  across 'Future' you can get it from RPCFuture
+		FutureTask<?> task =new FutureTask(new Callable() {
+			public Object call() {
+				Object result = null;
+				ResponseWrapper responseWrapper = null;
+
+				try {
+					
+                    result = finalResponseQueue.poll(
+							wrapper.getTimeout() - (System.currentTimeMillis() - beginTime),
+							TimeUnit.MILLISECONDS);
+                }
+                catch(Exception e){
+                    responses.remove(wrapper.getId());
+                    LOGGER.error("Get response error", e);
+                   // throw new Exception("Get response error", e);
+                }
+				responses.remove(wrapper.getId());
+
+				if (PRINT_CONSUME_MINTIME > 0 && isWarnEnabled) {
+                    long consumeTime = System.currentTimeMillis() - beginTime;
+                    if (consumeTime > PRINT_CONSUME_MINTIME) {
+                        LOGGER.warn("client.invokeSync consume time: "
+                                + consumeTime + " ms, server is: " + getServerIP()
+                                + ":" + getServerPort() + " request id is:"
+                                + wrapper.getId());
+                    }
+                }
+				if (result == null) {
+                    String errorMsg = "receive response timeout("
+                            + wrapper.getTimeout() + " ms),server is: "
+                            + getServerIP() + ":" + getServerPort()
+                            + " request id is:" + wrapper.getId();
+                   // throw new Exception(errorMsg);
+                }
+
+				if(result instanceof ResponseWrapper){
+                    responseWrapper = (ResponseWrapper) result;//
+                }
+                else if(result instanceof List){
+                    @SuppressWarnings("unchecked")
+                    List<ResponseWrapper> responseWrappers = (List<ResponseWrapper>) result;
+                    for (ResponseWrapper response : responseWrappers) {
+                        if(response.getRequestId() == wrapper.getId()){
+                            responseWrapper = response;
+                        }
+                        else{
+							try {
+								putResponse(response);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+                    }
+                }
+                else{
+                   // throw new Exception("only receive ResponseWrapper or List as response");
+                }
+				try{
+                    // do deserialize in business threadpool
+                    if (responseWrapper.getResponse() instanceof byte[]) {
+                        String responseClassName = null;
+                        if(responseWrapper.getResponseClassName() != null){
+                            responseClassName = new String(responseWrapper.getResponseClassName());
+                        }
+                        // avoid server no return object
+                        if(((byte[])responseWrapper.getResponse()).length == 0){
+                            responseWrapper.setResponse(null);
+                        }
+                        else{
+                            Object responseObject = Codecs.getDecoder(responseWrapper.getCodecType()).decode(
+                                responseClassName,(byte[]) responseWrapper.getResponse());
+                            if (responseObject instanceof Throwable) {
+                                responseWrapper.setException((Throwable) responseObject);
+                            } 
+                            else {
+                                responseWrapper.setResponse(responseObject);
+                            }
+                        }
+                    }
+                }
+                catch(Exception e){
+                    LOGGER.error("Deserialize response object error", e);
+                  //  throw new Exception("Deserialize response object error", e);
+                }
+				if (responseWrapper.isError()) {
+                    Throwable t = responseWrapper.getException();
+                    t.fillInStackTrace();
+                    String errorMsg = "server error,server is: " + getServerIP()
+                            + ":" + getServerPort() + " request id is:"
+                            + wrapper.getId();
+                    LOGGER.error(errorMsg, t);
+                  //  throw new Exception(errorMsg, t);
+                }
+				return responseWrapper.getResponse();
 			}
-		}
-		if (result == null) {
-			String errorMsg = "receive response timeout("
-					+ wrapper.getTimeout() + " ms),server is: "
-					+ getServerIP() + ":" + getServerPort()
-					+ " request id is:" + wrapper.getId();
-			throw new Exception(errorMsg);
-		}
+		});
+		RPCContext.getRPCContext().setFuture(task);
+		executor.execute(task);
+		return null;
 		
-		if(result instanceof ResponseWrapper){
-			responseWrapper = (ResponseWrapper) result;//
-		}
-		else if(result instanceof List){
-			@SuppressWarnings("unchecked")
-			List<ResponseWrapper> responseWrappers = (List<ResponseWrapper>) result;
-			for (ResponseWrapper response : responseWrappers) {
-				if(response.getRequestId() == wrapper.getId()){
-					responseWrapper = response;
-				}
-				else{
-					putResponse(response);
-				}
-			}
-		}
-		else{
-			throw new Exception("only receive ResponseWrapper or List as response");
-		}
-		try{
-			// do deserialize in business threadpool
-			if (responseWrapper.getResponse() instanceof byte[]) {
-				String responseClassName = null;
-				if(responseWrapper.getResponseClassName() != null){
-					responseClassName = new String(responseWrapper.getResponseClassName());
-				}
-				// avoid server no return object
-				if(((byte[])responseWrapper.getResponse()).length == 0){
-					responseWrapper.setResponse(null);
-				}
-				else{
-					Object responseObject = Codecs.getDecoder(responseWrapper.getCodecType()).decode(
-						responseClassName,(byte[]) responseWrapper.getResponse());
-					if (responseObject instanceof Throwable) {
-						responseWrapper.setException((Throwable) responseObject);
-					} 
-					else {
-						responseWrapper.setResponse(responseObject);
-					}
-				}
-			}
-		}
-		catch(Exception e){
-			LOGGER.error("Deserialize response object error", e);
-			throw new Exception("Deserialize response object error", e);
-		}
-		if (responseWrapper.isError()) {
-			Throwable t = responseWrapper.getException();
-			t.fillInStackTrace();
-			String errorMsg = "server error,server is: " + getServerIP()
-					+ ":" + getServerPort() + " request id is:"
-					+ wrapper.getId();
-			LOGGER.error(errorMsg, t);
-			throw new Exception(errorMsg, t);
-		}
-		return responseWrapper.getResponse();
+		
 	}
 
 	/**
